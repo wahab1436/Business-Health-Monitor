@@ -1,0 +1,99 @@
+# Business Health Monitor — System Configuration
+# All configurable parameters live here. Edit before running.
+
+# ─── Database ─────────────────────────────────────────────────────────────────
+database:
+  # For local dev use PostgreSQL; for Streamlit Cloud demo use SQLite
+  # Set DB_URL in .env to override (PostgreSQL)
+  # If DB_URL is not set, the system falls back to SQLite at the path below
+  sqlite_path: "data/business_health.db"
+  pool_size: 5
+  timeout: 30
+
+# ─── Data Generation ──────────────────────────────────────────────────────────
+data_generation:
+  seed: 42
+  n_days: 730          # 2 years of daily data
+  n_employees: 500
+  anomaly_injection_rate: 0.03   # 3% of records are anomalous
+  finance:
+    base_revenue: 100_000        # Daily base revenue (USD)
+    seasonality_amplitude: 0.15  # ±15% seasonal swing
+    noise_std: 0.05              # Gaussian noise std
+    expense_ratio_min: 0.70
+    expense_ratio_max: 0.85
+  hr:
+    departments:
+      - Engineering
+      - Sales
+      - HR
+      - Finance
+      - Operations
+    base_attrition_rate: 0.15    # 15% annual
+    satisfaction_mean: 3.5
+    satisfaction_std: 0.8
+  operations:
+    sla_target: 95.0             # %
+    uptime_target: 99.9          # %
+    avg_resolution_hours_mean: 4.0
+    ticket_volume_lambda: 150    # Poisson lambda (daily tickets)
+
+# ─── ML Model Hyperparameters ─────────────────────────────────────────────────
+ml:
+  finance_anomaly:
+    n_estimators: 200
+    contamination: 0.03
+    max_samples: "auto"
+    random_state: 42
+  revenue_forecast:
+    n_estimators: 300
+    learning_rate: 0.05
+    max_depth: 6
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+    forecast_horizon: 30         # days
+    lag_features: [7, 14, 30]
+  hr_attrition:
+    n_estimators: 300
+    max_depth: 12
+    min_samples_leaf: 5
+    class_weight: "balanced"
+    random_state: 42
+    risk_threshold: 0.65         # Probability > this → high risk
+  hr_anomaly:
+    n_neighbors: 20
+    contamination: 0.05
+  ops_anomaly:
+    n_estimators: 200
+    contamination: 0.03
+    bootstrap: true
+    random_state: 42
+
+# ─── Scoring Engine ───────────────────────────────────────────────────────────
+scoring:
+  weights:
+    finance: 0.40
+    hr: 0.30
+    operations: 0.30
+  anomaly_penalty_per_flag: 5    # Points deducted per active anomaly
+  max_anomaly_penalty: 20        # Cap on total deduction
+  bands:
+    green:  { min: 75, max: 100, label: "Healthy" }
+    yellow: { min: 50, max: 74,  label: "At Risk" }
+    red:    { min: 0,  max: 49,  label: "Critical" }
+
+# ─── AI Diagnostic Layer ──────────────────────────────────────────────────────
+ai:
+  model: "llama-3.1-8b-instant"
+  temperature: 0.3
+  max_tokens: 1024
+  report_min_words: 400
+  report_max_words: 600
+
+# ─── Pipeline ─────────────────────────────────────────────────────────────────
+pipeline:
+  log_level: "INFO"
+  log_file: "logs/pipeline.log"
+  ingestion_log: "logs/ingestion.log"
+  model_save_dir: "ml/saved/"
