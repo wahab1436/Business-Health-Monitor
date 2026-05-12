@@ -1,0 +1,193 @@
+2026-05-11 13:39:14,379 | INFO     | run_pipeline | Pipeline started — mode=full
+2026-05-11 13:39:14,442 | INFO     | run_pipeline | === STEP: Initialize Database ===
+2026-05-11 13:39:22,289 | INFO     | run_pipeline | SQLite schema initialized successfully.
+2026-05-11 13:39:22,334 | INFO     | run_pipeline | === STEP: Data Generation ===
+2026-05-11 13:39:22,484 | INFO     | run_pipeline | Finance data generated: 730 rows
+2026-05-11 13:39:22,491 | INFO     | run_pipeline | HR employees generated: 500 rows
+2026-05-11 13:39:23,895 | INFO     | run_pipeline | HR monthly snapshots generated: 12000 rows
+2026-05-11 13:39:23,919 | INFO     | run_pipeline | Operations data generated: 730 rows
+2026-05-11 13:39:23,919 | INFO     | run_pipeline | Data generation complete in 1.57s
+2026-05-11 13:39:23,925 | INFO     | run_pipeline | === STEP: SQL Ingestion ===
+2026-05-11 13:39:23,925 | INFO     | data.pipeline.ingest | Ingesting finance data from D:\python\business_health_monitor\data\raw\finance.csv
+2026-05-11 13:39:23,978 | INFO     | data.pipeline.ingest | [finance] Schema valid — 730 rows
+2026-05-11 13:39:24,040 | INFO     | data.pipeline.ingest | Finance: 730 new rows to insert (skipped 0)
+2026-05-11 13:39:24,219 | INFO     | data.pipeline.ingest | Finance: inserted 730 rows
+2026-05-11 13:39:24,298 | INFO     | data.pipeline.ingest | Ingesting HR employees from D:\python\business_health_monitor\data\raw\hr_employees.csv
+2026-05-11 13:39:24,312 | INFO     | data.pipeline.ingest | [hr_employees] Schema valid — 500 rows
+2026-05-11 13:39:24,312 | INFO     | data.pipeline.ingest | Ingesting HR snapshots from D:\python\business_health_monitor\data\raw\hr_monthly_snapshots.csv
+2026-05-11 13:39:24,421 | INFO     | data.pipeline.ingest | [hr_monthly_snapshot] Schema valid — 12000 rows
+2026-05-11 13:39:24,426 | INFO     | data.pipeline.ingest | HR employees: 500 new records
+2026-05-11 13:39:24,592 | INFO     | data.pipeline.ingest | HR snapshots: 12000 new records
+2026-05-11 13:39:26,251 | INFO     | data.pipeline.ingest | Ingesting operations data from D:\python\business_health_monitor\data\raw\ops.csv
+2026-05-11 13:39:26,267 | INFO     | data.pipeline.ingest | [ops] Schema valid — 730 rows
+2026-05-11 13:39:26,274 | INFO     | data.pipeline.ingest | Ops: 730 new rows to insert
+2026-05-11 13:39:26,427 | INFO     | data.pipeline.ingest | Ops: inserted 730 rows
+2026-05-11 13:39:26,474 | INFO     | run_pipeline | SQL ingestion complete in 2.55s
+2026-05-11 13:39:26,476 | INFO     | run_pipeline | === STEP: ML Models ===
+2026-05-11 13:39:43,799 | INFO     | run_pipeline | Training Finance Anomaly Detector…
+2026-05-11 13:39:43,932 | INFO     | ml.models.finance_anomaly | Training FinanceAnomalyDetector on 730 rows…
+2026-05-11 13:39:44,591 | INFO     | ml.models.finance_anomaly | FinanceAnomalyDetector trained.
+2026-05-11 13:39:44,799 | INFO     | ml.models.finance_anomaly | Wrote 22 finance anomalies to anomaly_log.
+2026-05-11 13:39:44,945 | INFO     | run_pipeline | Finance anomalies detected: 22
+2026-05-11 13:39:44,945 | INFO     | run_pipeline | Training Revenue Forecaster…
+2026-05-11 13:39:44,950 | INFO     | ml.models.revenue_forecast | Training RevenueForecaster on 730 rows…
+2026-05-11 13:39:45,813 | INFO     | ml.models.revenue_forecast | Walk-forward metrics: {'RMSE': 7485.85, 'MAE': 4949.04, 'MAPE': 5.9087}
+2026-05-11 13:39:46,259 | INFO     | ml.models.revenue_forecast | RevenueForecaster fitted on full dataset.
+2026-05-11 13:39:46,815 | INFO     | ml.models.revenue_forecast | Forecasted 30 days of revenue.
+2026-05-11 13:39:46,819 | INFO     | ml.models.revenue_forecast | Forecast written to health_scores (n=30).
+2026-05-11 13:39:46,853 | INFO     | run_pipeline | Revenue forecast for next 30 days written to DB.
+2026-05-11 13:39:46,854 | INFO     | run_pipeline | Training HR Attrition Classifier…
+2026-05-11 13:39:46,936 | INFO     | ml.models.hr_attrition | Training AttritionClassifier on 500 employees…
+2026-05-11 13:39:47,854 | INFO     | ml.models.hr_attrition | Attrition Classifier — ROC-AUC=0.4486, F1=0.9328
+Confusion Matrix:
+[[94  0]
+ [ 5  1]]
+2026-05-11 13:39:48,020 | INFO     | ml.models.hr_attrition | Updated attrition_probability for 500 employees.
+2026-05-11 13:39:48,183 | INFO     | run_pipeline | High-risk employees identified: 11
+2026-05-11 13:39:48,183 | INFO     | run_pipeline | Training HR Anomaly Detector…
+2026-05-11 13:39:48,312 | INFO     | ml.models.hr_anomaly | Training HRAnomalyDetector on 5 aggregates…
+2026-05-11 13:39:51,560 | INFO     | ml.models.hr_anomaly | HRAnomalyDetector trained.
+2026-05-11 13:39:51,574 | INFO     | run_pipeline | HR anomalies detected: 0
+2026-05-11 13:39:51,574 | INFO     | run_pipeline | Training Ops Anomaly Detector…
+2026-05-11 13:39:51,580 | INFO     | ml.models.ops_anomaly | Training OpsAnomalyDetector on 730 rows…
+2026-05-11 13:39:51,981 | INFO     | ml.models.ops_anomaly | OpsAnomalyDetector trained.
+2026-05-11 13:39:52,093 | INFO     | ml.models.ops_anomaly | Wrote 22 ops anomalies to anomaly_log.
+2026-05-11 13:39:52,223 | INFO     | run_pipeline | Ops anomalies detected: 22
+2026-05-11 13:39:52,290 | INFO     | run_pipeline | All ML models complete.
+2026-05-11 13:39:52,297 | INFO     | run_pipeline | === STEP: Health Scoring Engine ===
+2026-05-11 13:39:52,320 | INFO     | ml.scoring.health_scorer | Scoring data loaded — finance:90 hr:500 ops:30 anomalies:44
+2026-05-11 13:39:52,383 | INFO     | ml.scoring.health_scorer | Health score written: 55.3 (At Risk)
+2026-05-11 13:39:52,384 | INFO     | ml.scoring.health_scorer | Score written: {'finance': 67.23, 'hr': 70.65, 'ops': 90.68, 'composite': 55.29, 'band': 'At Risk', 'delta': 0.0, 'penalty': 20}
+2026-05-11 13:39:52,415 | INFO     | run_pipeline | Health Score: 55.3 (At Risk) | Finance=67.2  HR=70.7  Ops=90.7
+2026-05-11 13:39:52,417 | INFO     | run_pipeline | === STEP: AI Diagnostic Report ===
+2026-05-11 13:39:54,490 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-11 13:39:54,583 | INFO     | ml.ai_layer.diagnostic | AI report stored (279 words, fallback=False).
+2026-05-11 13:39:54,613 | INFO     | run_pipeline | AI report generated (279 words).
+2026-05-11 16:07:27,311 | INFO     | run_pipeline | Pipeline started — mode=full
+2026-05-11 16:07:27,433 | INFO     | run_pipeline | === STEP: Initialize Database ===
+2026-05-11 16:08:06,974 | INFO     | run_pipeline | SQLite schema initialized successfully.
+2026-05-11 16:08:06,977 | INFO     | run_pipeline | === STEP: Data Generation ===
+2026-05-11 16:08:07,236 | INFO     | run_pipeline | Finance data generated: 730 rows
+2026-05-11 16:08:07,267 | INFO     | run_pipeline | HR employees generated: 500 rows
+2026-05-11 16:08:08,403 | INFO     | run_pipeline | HR monthly snapshots generated: 12000 rows
+2026-05-11 16:08:08,432 | INFO     | run_pipeline | Operations data generated: 730 rows
+2026-05-11 16:08:08,433 | INFO     | run_pipeline | Data generation complete in 1.44s
+2026-05-11 16:08:08,437 | INFO     | run_pipeline | === STEP: SQL Ingestion ===
+2026-05-11 16:08:08,438 | INFO     | data.pipeline.ingest | Ingesting finance data from D:\python\business_health_monitor\data\raw\finance.csv
+2026-05-11 16:08:08,512 | INFO     | data.pipeline.ingest | [finance] Schema valid — 730 rows
+2026-05-11 16:08:08,613 | INFO     | data.pipeline.ingest | Finance: 0 new rows to insert (skipped 730)
+2026-05-11 16:08:08,614 | INFO     | data.pipeline.ingest | Ingesting HR employees from D:\python\business_health_monitor\data\raw\hr_employees.csv
+2026-05-11 16:08:08,628 | INFO     | data.pipeline.ingest | [hr_employees] Schema valid — 500 rows
+2026-05-11 16:08:08,628 | INFO     | data.pipeline.ingest | Ingesting HR snapshots from D:\python\business_health_monitor\data\raw\hr_monthly_snapshots.csv
+2026-05-11 16:08:08,718 | INFO     | data.pipeline.ingest | [hr_monthly_snapshot] Schema valid — 12000 rows
+2026-05-11 16:08:08,723 | INFO     | data.pipeline.ingest | HR employees: 0 new records
+2026-05-11 16:08:08,777 | INFO     | data.pipeline.ingest | HR snapshots: 0 new records
+2026-05-11 16:08:08,780 | INFO     | data.pipeline.ingest | Ingesting operations data from D:\python\business_health_monitor\data\raw\ops.csv
+2026-05-11 16:08:08,797 | INFO     | data.pipeline.ingest | [ops] Schema valid — 730 rows
+2026-05-11 16:08:08,803 | INFO     | data.pipeline.ingest | Ops: 0 new rows to insert
+2026-05-11 16:08:08,805 | INFO     | run_pipeline | SQL ingestion complete in 0.37s
+2026-05-11 16:08:08,807 | INFO     | run_pipeline | === STEP: ML Models ===
+2026-05-11 16:08:25,513 | INFO     | run_pipeline | Training Finance Anomaly Detector…
+2026-05-11 16:08:25,518 | INFO     | ml.models.finance_anomaly | Training FinanceAnomalyDetector on 730 rows…
+2026-05-11 16:08:26,074 | INFO     | ml.models.finance_anomaly | FinanceAnomalyDetector trained.
+2026-05-11 16:08:26,279 | INFO     | ml.models.finance_anomaly | Wrote 22 finance anomalies to anomaly_log.
+2026-05-11 16:08:26,449 | INFO     | run_pipeline | Finance anomalies detected: 22
+2026-05-11 16:08:26,449 | INFO     | run_pipeline | Training Revenue Forecaster…
+2026-05-11 16:08:26,457 | INFO     | ml.models.revenue_forecast | Training RevenueForecaster on 730 rows…
+2026-05-11 16:08:27,068 | INFO     | ml.models.revenue_forecast | Walk-forward metrics: {'RMSE': 7485.85, 'MAE': 4949.04, 'MAPE': 5.9087}
+2026-05-11 16:08:27,319 | INFO     | ml.models.revenue_forecast | RevenueForecaster fitted on full dataset.
+2026-05-11 16:08:27,831 | INFO     | ml.models.revenue_forecast | Forecasted 30 days of revenue.
+2026-05-11 16:08:27,861 | INFO     | ml.models.revenue_forecast | Forecast written to health_scores (n=30).
+2026-05-11 16:08:27,879 | INFO     | run_pipeline | Revenue forecast for next 30 days written to DB.
+2026-05-11 16:08:27,880 | INFO     | run_pipeline | Training HR Attrition Classifier…
+2026-05-11 16:08:27,957 | INFO     | ml.models.hr_attrition | Training AttritionClassifier on 500 employees…
+2026-05-11 16:08:28,706 | INFO     | ml.models.hr_attrition | Attrition Classifier — ROC-AUC=0.4486, F1=0.9328
+Confusion Matrix:
+[[94  0]
+ [ 5  1]]
+2026-05-11 16:08:28,844 | INFO     | ml.models.hr_attrition | Updated attrition_probability for 500 employees.
+2026-05-11 16:08:29,041 | INFO     | run_pipeline | High-risk employees identified: 11
+2026-05-11 16:08:29,041 | INFO     | run_pipeline | Training HR Anomaly Detector…
+2026-05-11 16:08:29,161 | INFO     | ml.models.hr_anomaly | Training HRAnomalyDetector on 5 aggregates…
+2026-05-11 16:08:31,390 | INFO     | ml.models.hr_anomaly | HRAnomalyDetector trained.
+2026-05-11 16:08:31,418 | INFO     | run_pipeline | HR anomalies detected: 0
+2026-05-11 16:08:31,418 | INFO     | run_pipeline | Training Ops Anomaly Detector…
+2026-05-11 16:08:31,426 | INFO     | ml.models.ops_anomaly | Training OpsAnomalyDetector on 730 rows…
+2026-05-11 16:08:31,856 | INFO     | ml.models.ops_anomaly | OpsAnomalyDetector trained.
+2026-05-11 16:08:31,998 | INFO     | ml.models.ops_anomaly | Wrote 22 ops anomalies to anomaly_log.
+2026-05-11 16:08:32,143 | INFO     | run_pipeline | Ops anomalies detected: 22
+2026-05-11 16:08:32,208 | INFO     | run_pipeline | All ML models complete.
+2026-05-11 16:08:32,214 | INFO     | run_pipeline | === STEP: Health Scoring Engine ===
+2026-05-11 16:08:32,239 | INFO     | ml.scoring.health_scorer | Scoring data loaded — finance:90 hr:500 ops:30 anomalies:88
+2026-05-11 16:08:32,315 | INFO     | ml.scoring.health_scorer | Health score written: 55.3 (At Risk)
+2026-05-11 16:08:32,315 | INFO     | ml.scoring.health_scorer | Score written: {'finance': 67.23, 'hr': 70.65, 'ops': 90.68, 'composite': 55.29, 'band': 'At Risk', 'delta': 0.0, 'penalty': 20}
+2026-05-11 16:08:32,348 | INFO     | run_pipeline | Health Score: 55.3 (At Risk) | Finance=67.2  HR=70.7  Ops=90.7
+2026-05-11 16:08:32,350 | INFO     | run_pipeline | === STEP: AI Diagnostic Report ===
+2026-05-11 16:08:35,990 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-11 16:08:36,072 | INFO     | ml.ai_layer.diagnostic | AI report stored (237 words, fallback=False).
+2026-05-11 16:08:36,115 | INFO     | run_pipeline | AI report generated (237 words).
+2026-05-12 20:41:13,652 | INFO     | run_pipeline | Pipeline started — mode=full
+2026-05-12 20:41:13,723 | INFO     | run_pipeline | === STEP: Initialize Database ===
+2026-05-12 20:41:24,286 | INFO     | run_pipeline | SQLite schema initialized successfully.
+2026-05-12 20:41:24,289 | INFO     | run_pipeline | === STEP: Data Generation ===
+2026-05-12 20:41:24,460 | INFO     | run_pipeline | Finance data generated: 730 rows
+2026-05-12 20:41:24,468 | INFO     | run_pipeline | HR employees generated: 500 rows
+2026-05-12 20:41:25,739 | INFO     | run_pipeline | HR monthly snapshots generated: 12000 rows
+2026-05-12 20:41:25,768 | INFO     | run_pipeline | Operations data generated: 730 rows
+2026-05-12 20:41:25,769 | INFO     | run_pipeline | Data generation complete in 1.45s
+2026-05-12 20:41:25,772 | INFO     | run_pipeline | === STEP: SQL Ingestion ===
+2026-05-12 20:41:25,772 | INFO     | data.pipeline.ingest | Ingesting finance data from D:\python\business_health_monitor\data\raw\finance.csv
+2026-05-12 20:41:25,813 | INFO     | data.pipeline.ingest | [finance] Schema valid — 730 rows
+2026-05-12 20:41:25,916 | INFO     | data.pipeline.ingest | Finance: 1 new rows to insert (skipped 729)
+2026-05-12 20:41:26,014 | INFO     | data.pipeline.ingest | Finance: inserted 1 rows
+2026-05-12 20:41:26,060 | INFO     | data.pipeline.ingest | Ingesting HR employees from D:\python\business_health_monitor\data\raw\hr_employees.csv
+2026-05-12 20:41:26,079 | INFO     | data.pipeline.ingest | [hr_employees] Schema valid — 500 rows
+2026-05-12 20:41:26,080 | INFO     | data.pipeline.ingest | Ingesting HR snapshots from D:\python\business_health_monitor\data\raw\hr_monthly_snapshots.csv
+2026-05-12 20:41:26,194 | INFO     | data.pipeline.ingest | [hr_monthly_snapshot] Schema valid — 12000 rows
+2026-05-12 20:41:26,245 | INFO     | data.pipeline.ingest | HR employees: 0 new records
+2026-05-12 20:41:26,396 | INFO     | data.pipeline.ingest | HR snapshots: 0 new records
+2026-05-12 20:41:26,400 | INFO     | data.pipeline.ingest | Ingesting operations data from D:\python\business_health_monitor\data\raw\ops.csv
+2026-05-12 20:41:26,417 | INFO     | data.pipeline.ingest | [ops] Schema valid — 730 rows
+2026-05-12 20:41:26,425 | INFO     | data.pipeline.ingest | Ops: 1 new rows to insert
+2026-05-12 20:41:26,487 | INFO     | data.pipeline.ingest | Ops: inserted 1 rows
+2026-05-12 20:41:26,531 | INFO     | run_pipeline | SQL ingestion complete in 0.76s
+2026-05-12 20:41:26,534 | INFO     | run_pipeline | === STEP: ML Models ===
+2026-05-12 20:41:43,599 | INFO     | run_pipeline | Training Finance Anomaly Detector…
+2026-05-12 20:41:43,606 | INFO     | ml.models.finance_anomaly | Training FinanceAnomalyDetector on 731 rows…
+2026-05-12 20:41:44,185 | INFO     | ml.models.finance_anomaly | FinanceAnomalyDetector trained.
+2026-05-12 20:41:44,355 | INFO     | ml.models.finance_anomaly | Wrote 22 finance anomalies to anomaly_log.
+2026-05-12 20:41:44,541 | INFO     | run_pipeline | Finance anomalies detected: 22
+2026-05-12 20:41:44,542 | INFO     | run_pipeline | Training Revenue Forecaster…
+2026-05-12 20:41:44,546 | INFO     | ml.models.revenue_forecast | Training RevenueForecaster on 731 rows…
+2026-05-12 20:41:45,291 | INFO     | ml.models.revenue_forecast | Walk-forward metrics: {'RMSE': 7585.6, 'MAE': 5042.1, 'MAPE': 6.0157}
+2026-05-12 20:41:45,575 | INFO     | ml.models.revenue_forecast | RevenueForecaster fitted on full dataset.
+2026-05-12 20:41:46,110 | INFO     | ml.models.revenue_forecast | Forecasted 30 days of revenue.
+2026-05-12 20:41:46,141 | INFO     | ml.models.revenue_forecast | Forecast written to health_scores (n=30).
+2026-05-12 20:41:46,181 | INFO     | run_pipeline | Revenue forecast for next 30 days written to DB.
+2026-05-12 20:41:46,182 | INFO     | run_pipeline | Training HR Attrition Classifier…
+2026-05-12 20:41:46,254 | INFO     | ml.models.hr_attrition | Training AttritionClassifier on 500 employees…
+2026-05-12 20:41:47,097 | INFO     | ml.models.hr_attrition | Attrition Classifier — ROC-AUC=0.4486, F1=0.9328
+Confusion Matrix:
+[[94  0]
+ [ 5  1]]
+2026-05-12 20:41:47,235 | INFO     | ml.models.hr_attrition | Updated attrition_probability for 500 employees.
+2026-05-12 20:41:47,440 | INFO     | run_pipeline | High-risk employees identified: 11
+2026-05-12 20:41:47,440 | INFO     | run_pipeline | Training HR Anomaly Detector…
+2026-05-12 20:41:47,575 | INFO     | ml.models.hr_anomaly | Training HRAnomalyDetector on 5 aggregates…
+2026-05-12 20:41:49,990 | INFO     | ml.models.hr_anomaly | HRAnomalyDetector trained.
+2026-05-12 20:41:50,015 | INFO     | run_pipeline | HR anomalies detected: 0
+2026-05-12 20:41:50,015 | INFO     | run_pipeline | Training Ops Anomaly Detector…
+2026-05-12 20:41:50,039 | INFO     | ml.models.ops_anomaly | Training OpsAnomalyDetector on 731 rows…
+2026-05-12 20:41:50,494 | INFO     | ml.models.ops_anomaly | OpsAnomalyDetector trained.
+2026-05-12 20:41:50,628 | INFO     | ml.models.ops_anomaly | Wrote 22 ops anomalies to anomaly_log.
+2026-05-12 20:41:50,774 | INFO     | run_pipeline | Ops anomalies detected: 22
+2026-05-12 20:41:50,822 | INFO     | run_pipeline | All ML models complete.
+2026-05-12 20:41:50,829 | INFO     | run_pipeline | === STEP: Health Scoring Engine ===
+2026-05-12 20:41:50,884 | INFO     | ml.scoring.health_scorer | Scoring data loaded — finance:90 hr:500 ops:30 anomalies:132
+2026-05-12 20:41:50,956 | INFO     | ml.scoring.health_scorer | Health score written: 55.4 (At Risk)
+2026-05-12 20:41:50,957 | INFO     | ml.scoring.health_scorer | Score written: {'finance': 67.41, 'hr': 70.65, 'ops': 90.68, 'composite': 55.36, 'band': 'At Risk', 'delta': 0.07, 'penalty': 20}
+2026-05-12 20:41:51,013 | INFO     | run_pipeline | Health Score: 55.4 (At Risk) | Finance=67.4  HR=70.7  Ops=90.7
+2026-05-12 20:41:51,015 | INFO     | run_pipeline | === STEP: AI Diagnostic Report ===
+2026-05-12 20:41:54,638 | INFO     | httpx | HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-12 20:41:54,735 | INFO     | ml.ai_layer.diagnostic | AI report stored (265 words, fallback=False).
+2026-05-12 20:41:54,766 | INFO     | run_pipeline | AI report generated (265 words).
